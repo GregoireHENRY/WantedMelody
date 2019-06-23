@@ -1,4 +1,4 @@
-![](Ressources/Images/Cowboy1.png)
+![](Ressources/Images/cowboy1.jpg)
 
 # WantedMelody
 
