@@ -2,52 +2,51 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerMotor))]
 public class PlayerController : MonoBehaviour
 {
 
-    PlayerMotor motor;
-
     [SerializeField]
-    float speed = 5f;
+    float speed = 10f;
     [SerializeField]
-    float lookSensitivity = 3f;
+    float jumpForce = 50f;
 
-    // Start is called before the first frame update
+    Transform groundPos;
+    Rigidbody rb;
+
+    float translation, straffe;
+    Vector3 groundForce;
+
+
+    // Use this for initialization
     void Start()
     {
-        motor = GetComponent<PlayerMotor>();
+        rb = GetComponent<Rigidbody>();
+        groundPos = transform.GetChild(1);
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
     void Update()
     {
-        float xMov = Input.GetAxisRaw("Horizontal");
-        float zMov = Input.GetAxisRaw("Vertical");
-        float yRot = Input.GetAxisRaw("Mouse X");
+        translation = Input.GetAxis("Vertical") * speed * Time.deltaTime;
+        straffe = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
 
-        Vector3 movHorizontal = transform.right * xMov;
-        Vector3 movVertical = transform.forward * zMov;
-        Vector3 velocity = (movHorizontal + movVertical).normalized * speed;
-        Vector3 rotation = new Vector3(0f, yRot, 0f) * lookSensitivity;
-
-        motor.Move(velocity);
-        motor.Rotate(rotation);
-    }
-
-    /*
-    void CaptureInteraction()
-    {
-        if (Input.GetMouseButtonDown(0))
+        groundForce = Vector3.zero;
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit, 100))
+            if (transform.position.y <= 2f) // Jumping is available only on the ground
             {
-                Debug.Log("You've clicked on something..");
+                groundForce = Vector3.up * jumpForce;
             }
+            
+        }
+
+        transform.Translate(straffe, 0, translation);
+        rb.AddForceAtPosition(groundForce, groundPos.position);
+
+        if (Input.GetKeyDown("escape"))
+        {
+            Cursor.lockState = CursorLockMode.None;
         }
     }
-    */
 }
