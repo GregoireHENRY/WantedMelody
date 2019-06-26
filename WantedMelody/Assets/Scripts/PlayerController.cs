@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     Transform groundPos;
     Rigidbody rb;
 
-    float translation, straffe;
+    float translation, straffe, jump;
     Vector3 groundForce;
 
     // Use this for initialization
@@ -30,9 +30,13 @@ public class PlayerController : MonoBehaviour
         translation = Input.GetAxis("Vertical") * speed * Time.deltaTime;
         straffe = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
 
-        transform.Translate(straffe, 0, translation);
-        
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            jump = speed * Time.deltaTime;
+        }
 
+        transform.Translate(straffe, jump, translation);
+        
         if (Input.GetKeyDown("escape"))
         {
             Cursor.lockState = CursorLockMode.None;
