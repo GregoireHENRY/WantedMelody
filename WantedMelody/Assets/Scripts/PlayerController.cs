@@ -16,12 +16,11 @@ public class PlayerController : MonoBehaviour
     float translation, straffe;
     Vector3 groundForce;
 
-
     // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        groundPos = transform.GetChild(1);
+        groundPos = transform.GetChild(2);
         Cursor.lockState = CursorLockMode.Locked;
     }
 
@@ -31,6 +30,15 @@ public class PlayerController : MonoBehaviour
         translation = Input.GetAxis("Vertical") * speed * Time.deltaTime;
         straffe = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
 
+        transform.Translate(straffe, 0, translation);
+        
+
+        if (Input.GetKeyDown("escape"))
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+        /*
         groundForce = Vector3.zero;
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -38,15 +46,8 @@ public class PlayerController : MonoBehaviour
             {
                 groundForce = Vector3.up * jumpForce;
             }
-            
         }
-
-        transform.Translate(straffe, 0, translation);
         rb.AddForceAtPosition(groundForce, groundPos.position);
-
-        if (Input.GetKeyDown("escape"))
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
+        */
     }
 }
