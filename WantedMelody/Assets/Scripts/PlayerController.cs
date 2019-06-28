@@ -7,18 +7,23 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     float speed = 10f;
+    [SerializeField]
+    float jumpForce = 7f;
 
-    Transform groundPos;
     Rigidbody rb;
+    CapsuleCollider col;
+    LayerMask groundLayer;
 
     bool isJumping;
-    float translation, straffe, jump, jumpAcc, jumpVel;
+    float moveHorizontal, moveVertical;
+    Vector3 movement;
 
     // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        jumpAcc = 300f;
+        col = GetComponent<CapsuleCollider>();
+        groundLayer = LayerMask.GetMask("Default");
 
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -26,41 +31,23 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        translation = Input.GetAxis("Vertical") * speed * Time.deltaTime;
-        straffe = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
-        jump = Jumping();
+        moveVertical = Input.GetAxis("Vertical");
+        moveHorizontal = Input.GetAxis("Horizontal");
+        movement = new Vector3(moveHorizontal, 0, moveVertical);
 
-        transform.Translate(straffe, jump, translation);
+        rb.AddRelativeForce(movement * speed, ForceMode.Impulse);
 
-        if (Input.GetKeyDown("escape"))
+        if (IsGrounded() && Input.GetKeyDown(KeyCode.Space))
         {
-            Cursor.lockState = CursorLockMode.None;
+            rb.AddRelativeForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
 
-    float Jumping()
+    bool IsGrounded()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
-        {
-            isJumping = true;
-            jumpVel = jumpAcc * Time.deltaTime;
-        }
-
-        if (isJumping)
-        {
-            if (jumpVel > 0)
-            {
-                jumpVel -= 9.81f * Time.deltaTime;
-            }
-            jump = jumpVel * Time.deltaTime;
-        }
-
-        if (jump < 0f)
-        {
-            isJumping = false;
-            jump = 0f;
-        }
-
-        return jump;
+        return Physics.CheckCapsule(col.bounds.center,
+                                    new Vector3(col.bounds.center.x, col.bounds.min.y, col.bounds.center.z),
+                                    col.radius * .5f, 
+                                    groundLayer);
     }
 }
