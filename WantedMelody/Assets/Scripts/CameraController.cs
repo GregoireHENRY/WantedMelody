@@ -26,9 +26,9 @@ public class CameraController : MonoBehaviour
     {
         md = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * sensitivity;
         playerRotation = new Vector3(0f, md.x, 0f);
-        // cameraRotation = new Vector3(-md.y, 0f, 0f) * .25f;
+        cameraRotation = new Vector3(-md.y, 0f, 0f) * .25f;
 
-        // player.transform.Rotate(playerRotation);
-        // cam.transform.Rotate(cameraRotation);
+        player.transform.Rotate(playerRotation);
+        cam.transform.Rotate(cameraRotation);
     }
 }
