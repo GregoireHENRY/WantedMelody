@@ -7,20 +7,19 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     float speed = 10f;
-    [SerializeField]
-    float jumpForce = 50f;
 
     Transform groundPos;
     Rigidbody rb;
 
-    float translation, straffe, jump;
-    // Vector3 groundForce;
+    bool isJumping;
+    float translation, straffe, jump, jumpAcc, jumpVel;
 
     // Use this for initialization
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        // groundPos = transform.GetChild(2);
+        jumpAcc = 300f;
+
         Cursor.lockState = CursorLockMode.Locked;
     }
 
@@ -29,11 +28,7 @@ public class PlayerController : MonoBehaviour
     {
         translation = Input.GetAxis("Vertical") * speed * Time.deltaTime;
         straffe = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            jump = speed * Time.deltaTime;
-        }
+        jump = Jumping();
 
         transform.Translate(straffe, jump, translation);
 
@@ -41,17 +36,31 @@ public class PlayerController : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
         }
+    }
 
-        /*
-        groundForce = Vector3.zero;
-        if (Input.GetKeyDown(KeyCode.Space))
+    float Jumping()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
         {
-            if (transform.position.y <= 2f) // Jumping is available only on the ground
-            {
-                groundForce = Vector3.up * jumpForce;
-            }
+            isJumping = true;
+            jumpVel = jumpAcc * Time.deltaTime;
         }
-        rb.AddForceAtPosition(groundForce, groundPos.position);
-        */
+
+        if (isJumping)
+        {
+            if (jumpVel > 0)
+            {
+                jumpVel -= 9.81f * Time.deltaTime;
+            }
+            jump = jumpVel * Time.deltaTime;
+        }
+
+        if (jump < 0f)
+        {
+            isJumping = false;
+            jump = 0f;
+        }
+
+        return jump;
     }
 }
