@@ -3,32 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
-{
+{ 
+    [Header("Camera Collision")]
+    public float minDistance = 1.0f;
+    public float maxDistance = 4.0f;
+    public float smooth = 10.0f;
 
-    [SerializeField]
-    float sensitivity = 2.5f;
+    GameObject followPoint;
+    Vector3 playerDirection;
+    float distanceToPlayer;
 
-    Rigidbody player;
-    Camera cam;
-
-    Vector2 md;
-    Vector3 playerRotation, cameraRotation;
-
-    // Use this for initialization
     void Start()
     {
-        player = GetComponent<Rigidbody>();
-        cam = GetComponentInChildren<Camera>();
+        playerDirection = transform.localPosition.normalized;
+        distanceToPlayer = transform.localPosition.magnitude;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        md = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * sensitivity;
-        playerRotation = new Vector3(0f, md.x, 0f);
-        cameraRotation = new Vector3(-md.y, 0f, 0f) * .25f;
+        CameraCollision();
+    }
 
-        player.transform.Rotate(playerRotation);
-        cam.transform.Rotate(cameraRotation);
+    void CameraCollision()
+    {
+        Vector3 desiredCameraPos = transform.parent.TransformPoint(playerDirection * maxDistance);
+        RaycastHit hit;
+        if (Physics.Linecast(transform.parent.position, desiredCameraPos, out hit))
+        {
+            distanceToPlayer = Mathf.Clamp(hit.distance * 0.85f, minDistance, maxDistance);
+        }
+        else
+        {
+            distanceToPlayer = maxDistance;
+        }
+        transform.localPosition = Vector3.Lerp(transform.localPosition, playerDirection * distanceToPlayer, Time.deltaTime * smooth);
     }
 }
